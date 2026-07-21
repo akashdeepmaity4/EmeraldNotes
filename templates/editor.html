@@ -3,28 +3,27 @@
 {% block title %}Emerald Notes - Editor{% endblock %}
 
 {% block content %}
-<div class="editor-container">
-    <div class="editor-header">
-        <input 
-            type="text" 
-            id="filenameInput" 
-            placeholder="Project Name..." 
-            value="{{ filename }}" 
-            {% if filename %}readonly{% endif %}
-        >
-        <button id="saveBtn" class="save-btn">Save Project</button>
+<div class="editor-workspace">
+    <div class="toolbar-left">
+        <a href="{{ url_for('new_project') }}" class="pill-btn">New Page</a>
+        <button id="resize-btn" class="pill-btn">Resize</button>
+        <button id="preview-btn" class="pill-btn">Preview</button>
+        <button id="save-btn" class="pill-btn">Save</button>
     </div>
 
-    <div class="editor-workspace">
-        <div class="pane input-pane">
-            <h3>Input</h3>
-            <textarea id="rawInput" placeholder="Type your text or *commands here...">{{ content }}</textarea>
-        </div>
+    <div class="editor-canvas-container">
+        <textarea id="editor-textarea" placeholder="Start typing here...">{{ content }}</textarea>
 
-        <div class="pane preview-pane">
-            <h3>Preview</h3>
-            <div id="parsedOutput" class="parsed-content"></div>
-        </div>
+        <div id="preview-container" class="preview-viewport" style="display: none;"></div>
+    </div>
+
+    <div class="instructions-panel">
+        <h3>How to use</h3>
+        <p>Write plain content Text as it is.</p>
+        <p>Use <code>*</code> before text to convert to command.</p>
+        <p>Use <code>**</code> before word to use command as plain text.</p>
     </div>
 </div>
+
+<input type="hidden" id="current-filename" value="{{ filename }}">
 {% endblock %}

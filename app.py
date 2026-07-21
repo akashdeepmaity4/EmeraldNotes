@@ -4,15 +4,16 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 
 app = Flask(__name__)
 STORAGE_DIR = os.path.join(os.path.dirname(__file__), 'storage')
-
 if not os.path.exists(STORAGE_DIR):
     os.makedirs(STORAGE_DIR)
 
-import os
-import re
-from flask import Flask, render_template, request, jsonify, redirect, url_for
-
 def parse_custom_markdown(text):
+    """
+    Custom parser rules:
+    - *word or *word(arg): custom command parsing (h1-h6, img, a, formatting, etc.)
+    - Default *word (like *header or *link without args) treats as H1 or href
+    - **word: treated as normal paragraph text
+    """
     lines = text.splitlines()
     parsed_output = []
     in_code_block = False
@@ -49,7 +50,6 @@ def parse_custom_markdown(text):
             code_block_lines.append(line)
             continue
 
-        # Rule: **word -> treated as plain normal paragraph text (per initial rules)
         if stripped.startswith('**') and not stripped.endswith('**'):
             parsed_output.extend(close_lists())
             content = stripped[2:]
@@ -63,9 +63,10 @@ def parse_custom_markdown(text):
                 cmd = match.group(1).lower()
                 arg = match.group(2) if match.group(2) else ""
 
-                if cmd in ['h1', 'header1']:
+                # Headers
+                if cmd in ['h1', 'header1', 'header']:
                     parsed_output.extend(close_lists())
-                    parsed_output.append(f"<h1>{arg}</h1>")
+                    parsed_output.append(f"<h1>{arg if arg else cmd}</h1>")
                 elif cmd in ['h2', 'header2']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<h2>{arg}</h2>")
@@ -81,12 +82,16 @@ def parse_custom_markdown(text):
                 elif cmd in ['h6', 'header6']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<h6>{arg}</h6>")
+
+                # Links & Images
                 elif cmd in ['img', 'image', 'linkimg']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f'<img src="{arg}" alt="Image" />')
                 elif cmd in ['a', 'href', 'link', 'linkhref']:
                     parsed_output.extend(close_lists())
-                    parsed_output.append(f'<a href="{arg}">{arg}</a>')
+                    target_url = arg if arg else cmd
+                    parsed_output.append(f'<a href="{target_url}">{target_url}</a>')
+
                 elif cmd in ['b', 'bold']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<p><strong>{arg}</strong></p>")
@@ -99,6 +104,8 @@ def parse_custom_markdown(text):
                 elif cmd in ['code', 'inlinecode']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<p><code>{arg}</code></p>")
+
+                # Blockquotes & Horizontal Rule
                 elif cmd in ['quote', 'blockquote']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<blockquote>{arg}</blockquote>")
@@ -145,17 +152,15 @@ def parse_custom_markdown(text):
 
 @app.route('/')
 def home():
-    files = [f for f in os.listdir(STORAGE_DIR) if f.endswith('.txt')]
-    
+    files = [f for f in os.listdir(STORAGE_DIR) if f.endswith(('.md', '.txt'))]
     if not files:
         return render_template('empty.html')
-    
-    return render_template('dashboard.html', projects=files)
+    return render_template('dashboard.html', projects=files) 
 
 
 @app.route('/new')
 def new_project():
-    return render_template('editor.html', filename='', content='')
+    return render_template('editor.html', filename='', content='') # Page 3/4 (Editor)
 
 
 @app.route('/edit/<filename>')
@@ -185,8 +190,8 @@ def save_project():
     if not filename:
         return jsonify({'error': 'Filename is required'}), 400
 
-    if not filename.endswith('.txt'):
-        filename += '.txt'
+    if not (filename.endswith('.md') or filename.endswith('.txt')):
+        filename += '.md'
 
     filepath = os.path.join(STORAGE_DIR, filename)
     with open(filepath, 'w', encoding='utf-8') as f:
