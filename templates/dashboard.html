@@ -3,21 +3,21 @@
 {% block title %}Emerald Notes - Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <div class="dashboard-header">
-        <h2>Your Projects</h2>
-        <a href="{{ url_for('new_project') }}" class="create-btn">+ New Project</a>
-    </div>
+<div class="projects-grid">
+    <!-- New Project Card -->
+    <a href="{{ url_for('new_project') }}" class="project-card new-card">
+        <div class="card-icon">+</div>
+        <div class="card-label">New</div>
+    </a>
 
-    <div class="project-grid">
-        {% for project in projects %}
-            <div class="project-card">
-                <div class="project-info">
-                    <h3>{{ project }}</h3>
-                </div>
-                <a href="{{ url_for('edit_project', filename=project) }}" class="open-btn">Open</a>
-            </div>
-        {% endfor %}
-    </div>
+    <!-- Existing Projects Cards -->
+    {% for file in projects %}
+    <a href="{{ url_for('edit_project', filename=file) }}" class="project-card doc-card">
+        <div class="card-preview">
+            <span class="vertical-title">{{ file }}</span>
+        </div>
+        <div class="card-label">{{ file }}</div>
+    </a>
+    {% endfor %}
 </div>
 {% endblock %}

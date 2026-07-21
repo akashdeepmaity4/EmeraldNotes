@@ -7,32 +7,30 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="brand">
-                <h1>Emerald Notes</h1>
+    <!-- Top Navigation Header -->
+    <header class="navbar">
+        <a href="{{ url_for('home') }}" class="brand-pill">Emerald Notes</a>
+        
+        <div class="nav-right">
+            <!-- Dark Mode Slider Toggle -->
+            <label class="switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+            <!-- User Icon Placeholder -->
+            <div class="user-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
             </div>
-            
-            <nav class="nav-menu">
-                <a href="{{ url_for('home') }}" class="nav-item">Dashboard</a>
-                <a href="{{ url_for('new_project') }}" class="nav-item new-btn">+ New</a>
-            </nav>
+        </div>
+    </header>
 
-            <!-- Dark Mode Switcher (Page 4) -->
-            <div class="theme-toggle-container">
-                <span class="toggle-label">Dark Mode</span>
-                <label class="switch">
-                    <input type="checkbox" id="darkModeToggle">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            {% block content %}{% endblock %}
-        </main>
-    </div>
+    <!-- Page Content Container -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

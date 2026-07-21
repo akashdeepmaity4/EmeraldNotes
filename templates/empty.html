@@ -3,11 +3,11 @@
 {% block title %}Emerald Notes - Home{% endblock %}
 
 {% block content %}
-<div class="empty-state-container">
-    <div class="empty-state-card">
-        <h2>No Projects Found</h2>
-        <p>You don't have any notes created yet. Click below to start your first project.</p>
-        <a href="{{ url_for('new_project') }}" class="create-btn">+ Create New Project</a>
-    </div>
+<div class="projects-grid">
+    <!-- Single 'New' button card when storage is completely empty -->
+    <a href="{{ url_for('new_project') }}" class="project-card new-card">
+        <div class="card-icon">+</div>
+        <div class="card-label">New</div>
+    </a>
 </div>
 {% endblock %}
