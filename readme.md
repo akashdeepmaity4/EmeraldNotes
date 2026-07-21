@@ -31,3 +31,53 @@ python app.py
 pip install -r requirements.txt
 ```
 
+
+# HOW TO USE: (syntax)
+@@@
+Here is the exact syntax for every command built into your custom parser script:
+
+### **1. Headers**
+
+* **Syntax:** `*h1(Your Header Text)`
+* **Aliases:** `*header1`, `*h2` through `*h6`, `*header2` through `*header6`
+
+### **2. Links & Images**
+
+* **Links Syntax:** `*link([https://example.com](https://example.com))`
+* *Aliases:* `*a`, `*href`, `*linkhref`
+
+
+* **Images Syntax:** `*img([https://example.com/image.jpg](https://example.com/image.jpg))`
+* *Aliases:* `*image`, `*linkimg`
+
+
+
+### **3. Text Formatting**
+
+* **Bold:** `*bold(some text)` *(Alias: `*b`)*
+* **Italic:** `*italic(some text)` *(Aliases: `*i`, `*em`)*
+* **Strikethrough:** `*strike(some text)` *(Aliases: `*s`, `*del`)*
+* **Inline Code:** `*code(print("hello"))` *(Alias: `*inlinecode`)*
+
+### **4. Lists & Tasks**
+
+* **Bullet List Item:** `*bullet(list item text)` *(Aliases: `*li`, `*ul`)*
+* **Numbered List Item:** `*number(list item text)` *(Aliases: `*oli`, `*ol`)*
+* **Unchecked Task:** `*task(buy groceries)` *(Alias: `*todo`)*
+* **Checked Task:** `*taskdone(finish homework)` *(Alias: `*done`)*
+
+### **5. Blockquotes & Dividers**
+
+* **Blockquote:** `*quote(wisdom text here)` *(Alias: `*blockquote`)*
+* **Horizontal Divider:** `*hr` *(Aliases: `*rule`, `*divider`)*
+
+### **6. Multiline Code Blocks**
+
+* **Syntax:** Wrap code lines inside triple backticks:
+def hello():
+print("world")
+### **7. Escaping Commands (Plain Text)**
+
+* **Syntax:** `**text here`
+* **Behavior:** Forces lines starting with `*` to be treated as a standard, literal paragraph instead of triggering a command.
+
