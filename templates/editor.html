@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Emerald Notes - Editor{% endblock %}
+
+{% block content %}
+<div class="editor-container">
+    <div class="editor-header">
+        <input 
+            type="text" 
+            id="filenameInput" 
+            placeholder="Project Name..." 
+            value="{{ filename }}" 
+            {% if filename %}readonly{% endif %}
+        >
+        <button id="saveBtn" class="save-btn">Save Project</button>
+    </div>
+
+    <div class="editor-workspace">
+        <div class="pane input-pane">
+            <h3>Input</h3>
+            <textarea id="rawInput" placeholder="Type your text or *commands here...">{{ content }}</textarea>
+        </div>
+
+        <div class="pane preview-pane">
+            <h3>Preview</h3>
+            <div id="parsedOutput" class="parsed-content"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

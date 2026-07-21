@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Emerald Notes{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <h1>Emerald Notes</h1>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="{{ url_for('home') }}" class="nav-item">Dashboard</a>
+                <a href="{{ url_for('new_project') }}" class="nav-item new-btn">+ New</a>
+            </nav>
+
+            <!-- Dark Mode Switcher (Page 4) -->
+            <div class="theme-toggle-container">
+                <span class="toggle-label">Dark Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

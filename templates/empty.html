@@ -1,0 +1,15 @@
+<!-- For any student Github user, no intermediate coders, the '{%%}' are Jinja2 code control tags, not comments. DO NOT DELETE -->
+
+{% extends "base.html" %}
+
+{% block title %}Emerald Notes - Home{% endblock %}
+
+{% block content %}
+<div class="empty-state-container">
+    <div class="empty-state-card">
+        <h2>No Projects Found</h2>
+        <p>You don't have any notes created yet. Click below to start your first project.</p>
+        <a href="{{ url_for('new_project') }}" class="create-btn">+ Create New Project</a>
+    </div>
+</div>
+{% endblock %}
