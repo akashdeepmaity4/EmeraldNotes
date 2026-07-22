@@ -1,19 +1,14 @@
 import os
 import re
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify, redirect, url_for
+from flask import render_template as r
 
 app = Flask(__name__)
 STORAGE_DIR = os.path.join(os.path.dirname(__file__), 'storage')
 if not os.path.exists(STORAGE_DIR):
     os.makedirs(STORAGE_DIR)
 
-def parse_custom_markdown(text):
-    """
-    Custom parser rules:
-    - *word or *word(arg): custom command parsing (h1-h6, img, a, formatting, etc.)
-    - Default *word (like *header or *link without args) treats as H1 or href
-    - **word: treated as normal paragraph text
-    """
+def parse(text):
     lines = text.splitlines()
     parsed_output = []
     in_code_block = False
@@ -35,9 +30,8 @@ def parse_custom_markdown(text):
     for line in lines:
         stripped = line.strip()
 
-        # Handle ``` code blocks
         if stripped.startswith("```"):
-            if in_code_block:
+            if blockedcode:
                 parsed_output.append(f"<pre><code>{'<br>'.join(code_block_lines)}</code></pre>")
                 code_block_lines = []
                 in_code_block = False
@@ -63,7 +57,6 @@ def parse_custom_markdown(text):
                 cmd = match.group(1).lower()
                 arg = match.group(2) if match.group(2) else ""
 
-                # Headers
                 if cmd in ['h1', 'header1', 'header']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<h1>{arg if arg else cmd}</h1>")
@@ -83,7 +76,6 @@ def parse_custom_markdown(text):
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<h6>{arg}</h6>")
 
-                # Links & Images
                 elif cmd in ['img', 'image', 'linkimg']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f'<img src="{arg}" alt="Image" />')
@@ -91,7 +83,6 @@ def parse_custom_markdown(text):
                     parsed_output.extend(close_lists())
                     target_url = arg if arg else cmd
                     parsed_output.append(f'<a href="{target_url}">{target_url}</a>')
-
                 elif cmd in ['b', 'bold']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<p><strong>{arg}</strong></p>")
@@ -104,16 +95,12 @@ def parse_custom_markdown(text):
                 elif cmd in ['code', 'inlinecode']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<p><code>{arg}</code></p>")
-
-                # Blockquotes & Horizontal Rule
                 elif cmd in ['quote', 'blockquote']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<blockquote>{arg}</blockquote>")
                 elif cmd in ['hr', 'rule', 'divider']:
                     parsed_output.extend(close_lists())
                     parsed_output.append("<hr />")
-
-                # Lists
                 elif cmd in ['li', 'bullet', 'ul']:
                     if not in_unordered_list:
                         parsed_output.extend(close_lists())
@@ -126,14 +113,12 @@ def parse_custom_markdown(text):
                         parsed_output.append("<ol>")
                         in_ordered_list = True
                     parsed_output.append(f"<li>{arg}</li>")
-
                 elif cmd in ['task', 'todo']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f'<p><input type="checkbox" disabled /> {arg}</p>')
                 elif cmd in ['taskdone', 'done']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f'<p><input type="checkbox" checked disabled /> {arg}</p>')
-
                 else:
                     parsed_output.extend(close_lists())
                     content = arg if arg else cmd
@@ -154,13 +139,13 @@ def parse_custom_markdown(text):
 def home():
     files = [f for f in os.listdir(STORAGE_DIR) if f.endswith(('.md', '.txt'))]
     if not files:
-        return render_template('empty.html')
-    return render_template('dashboard.html', projects=files) 
+        return r('empty.html')
+    return r('dashboard.html', projects=files) 
 
 
 @app.route('/new')
 def new_project():
-    return render_template('editor.html', filename='', content='') # Page 3/4 (Editor)
+    return r('editor.html', filename='', content='')
 
 
 @app.route('/edit/<filename>')
@@ -169,18 +154,14 @@ def edit_project(filename):
     if os.path.exists(filepath):
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
-        return render_template('editor.html', filename=filename, content=content)
+        return r('editor.html', filename=filename, content=content)
     return redirect(url_for('home'))
-
-
 @app.route('/api/parse', methods=['POST'])
 def parse_text():
     data = request.get_json() or {}
     raw_text = data.get('text', '')
-    parsed_html = parse_custom_markdown(raw_text)
+    parsed_html = parse(raw_text)
     return jsonify({'html': parsed_html})
-
-
 @app.route('/api/save', methods=['POST'])
 def save_project():
     data = request.get_json() or {}
@@ -196,9 +177,8 @@ def save_project():
     filepath = os.path.join(STORAGE_DIR, filename)
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(content)
-
     return jsonify({'success': True, 'filename': filename})
-
-
 if __name__ == '__main__':
     app.run(debug=True)
+else:
+    pass
