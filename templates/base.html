@@ -7,17 +7,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <!-- Top Navigation Header -->
     <header class="navbar">
         <a href="{{ url_for('home') }}" class="brand-pill">Emerald Notes</a>
         
         <div class="nav-right">
-            <!-- Dark Mode Slider Toggle -->
             <label class="switch">
                 <input type="checkbox" id="theme-toggle">
                 <span class="slider"></span>
             </label>
-            <!-- User Icon Placeholder -->
             <div class="user-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -27,7 +24,6 @@
         </div>
     </header>
 
-    <!-- Page Content Container -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>

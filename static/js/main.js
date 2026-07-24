@@ -1,10 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ----------------------------------------------------
-    // 1. Dark Mode Toggle
-    // ----------------------------------------------------
     const themeToggle = document.getElementById('theme-toggle');
     
-    // Check saved theme or system preference
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
         if (themeToggle) themeToggle.checked = true;
@@ -22,9 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ----------------------------------------------------
-    // 2. Editor & Preview Toggle Logic
-    // ----------------------------------------------------
     const previewBtn = document.getElementById('preview-btn');
     const saveBtn = document.getElementById('save-btn');
     const editorArea = document.getElementById('editor-textarea');
@@ -35,12 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!editorArea || !previewArea) return;
 
         if (editorArea.style.display === 'none') {
-            // Switch back to Edit Mode
             editorArea.style.display = 'block';
             previewArea.style.display = 'none';
             if (previewBtn) previewBtn.textContent = 'Preview';
         } else {
-            // Fetch parsed HTML and switch to Preview Mode
             fetch('/api/parse', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -61,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
         previewBtn.addEventListener('click', togglePreview);
     }
 
-    // Shortcut: Ctrl + Shift + V (VSCode style preview toggle)
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'v') {
             e.preventDefault();
@@ -69,16 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ----------------------------------------------------
-    // 3. Save Functionality
-    // ----------------------------------------------------
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
             let filename = filenameInput.value;
 
             if (!filename) {
                 filename = prompt("Enter a filename for your project:", "note1.md");
-                if (!filename) return; // User cancelled
+                if (!filename) return; 
             }
 
             fetch('/api/save', {
