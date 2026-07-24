@@ -252,19 +252,20 @@ input:checked + .slider:before {
     justify-content: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     overflow: hidden;
+    padding: 10px;
 }
 
-.vertical-title {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    transform: rotate(180deg);
-    color: #8b1e28;
-    font-size: 1.1rem;
-    font-weight: bold;
-    max-height: 120px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.preview-text {
+    color: #0d3b1e;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    text-align: left;
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    line-clamp: 7;
+    -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
 }
 
 .card-label {
