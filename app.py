@@ -306,7 +306,7 @@ def save_project():
     if not filename:
         return jsonify({'error': 'Invalid filename'}), 400
 
-    if not (filename.endswith('.md') or filename.endswith('.txt')):
+    if not (filename.lower().endswith(('.md', '.txt'))):
         filename += '.md'
 
     filepath = os.path.join(STORAGE_DIR, filename)
