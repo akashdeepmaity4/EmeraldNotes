@@ -1,2 +1,9 @@
-storage/*
-!storage/.gitkeep
+build/
+dist/
+*.spec
+
+__pycache__/
+*.pyc
+*.pyo
+
+storage/

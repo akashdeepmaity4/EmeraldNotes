@@ -1,25 +1,27 @@
+import sys
 import os
 import re
-import sys
 from flask import Flask, request, jsonify, redirect, url_for
 from flask import render_template as r
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
-STORAGE_DIR = os.path.join(os.path.dirname(__file__), 'storage')
-if not os.path.exists(STORAGE_DIR):
-    os.makedirs(STORAGE_DIR)
-
-app = Flask(__name__,
-            template_folder=resource_path('templates'),
-            static_folder=resource_path('static'))
-
+#deploying as executable application
 def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
+
+app = Flask(__name__,
+            template_folder=resource_path('templates'),
+            static_folder=resource_path('static'))
+
+STORAGE_DIR = os.path.join(os.path.dirname(__file__), 'storage')
+if not os.path.exists(STORAGE_DIR):
+    os.makedirs(STORAGE_DIR)
+
+#main functionality
 
 def parse(text):
     lines = text.splitlines()
@@ -147,7 +149,6 @@ def parse(text):
     parsed_output.extend(close_lists())
     return "\n".join(parsed_output)
 
-
 def to_markdown(text):
     lines = text.splitlines()
     out = []
@@ -167,8 +168,6 @@ def to_markdown(text):
             continue
 
         if stripped.startswith('**') and not stripped.endswith('**'):
-            # Escape hatch: emit as literal plain text, escaping any
-            # leading markdown-significant characters
             content = stripped[2:]
             out.append(content.lstrip('*#-'))
             ol_counter = 0
@@ -231,7 +230,6 @@ def to_markdown(text):
 
     return "\n".join(out)
 
-
 def get_preview(content, max_chars=140):
     """Strip basic Markdown syntax and return a short plain-text snippet
     for the dashboard card preview."""
@@ -240,7 +238,6 @@ def get_preview(content, max_chars=140):
         stripped = line.strip()
         if not stripped:
             continue
-        # Strip common markdown markers so the preview reads as plain text
         stripped = re.sub(r'^#{1,6}\s*', '', stripped)
         stripped = re.sub(r'^[-*]\s+(\[[ xX]\]\s*)?', '', stripped)
         stripped = re.sub(r'^\d+\.\s+', '', stripped)
@@ -259,7 +256,6 @@ def get_preview(content, max_chars=140):
     if len(text) > max_chars:
         text = text[:max_chars].rsplit(' ', 1)[0] + '…'
     return text or "(empty note)"
-
 
 @app.route('/')
 def home():
@@ -280,11 +276,9 @@ def home():
 
     return r('dashboard.html', projects=projects)
 
-
 @app.route('/new')
 def new_project():
     return r('editor.html', filename='', content='')
-
 
 @app.route('/edit/<filename>')
 def edit_project(filename):
@@ -297,12 +291,14 @@ def edit_project(filename):
             content = f.read()
         return r('editor.html', filename=filename, content=content)
     return redirect(url_for('home'))
+
 @app.route('/api/parse', methods=['POST'])
 def parse_text():
     data = request.get_json() or {}
     raw_text = data.get('text', '')
     parsed_html = parse(raw_text)
     return jsonify({'html': parsed_html})
+
 @app.route('/api/save', methods=['POST'])
 def save_project():
     data = request.get_json() or {}
@@ -326,7 +322,6 @@ def save_project():
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(to_markdown(content))
     return jsonify({'success': True, 'filename': filename})
+
 if __name__ == '__main__':
     app.run(debug=True)
-else:
-    pass
