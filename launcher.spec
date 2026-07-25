@@ -5,5 +5,4 @@ a = Analysis(
     datas=[('templates', 'templates'), ('static', 'static')],
     hiddenimports=[],
     hookspath=[],
-    ...
 )
