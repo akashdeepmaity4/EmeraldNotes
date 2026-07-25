@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 from flask import Flask, request, jsonify, redirect, url_for
 from flask import render_template as r
 from werkzeug.utils import secure_filename
@@ -8,6 +9,17 @@ app = Flask(__name__)
 STORAGE_DIR = os.path.join(os.path.dirname(__file__), 'storage')
 if not os.path.exists(STORAGE_DIR):
     os.makedirs(STORAGE_DIR)
+
+app = Flask(__name__,
+            template_folder=resource_path('templates'),
+            static_folder=resource_path('static'))
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 def parse(text):
     lines = text.splitlines()
@@ -137,8 +149,6 @@ def parse(text):
 
 
 def to_markdown(text):
-    """Convert the app's custom *command syntax into standard Markdown
-    so saved .md files render correctly in any normal Markdown viewer."""
     lines = text.splitlines()
     out = []
     in_code_block = False
