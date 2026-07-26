@@ -38,12 +38,19 @@ python app.py
 pip install -r requirements.txt
 ```
 # HOW TO EDIT FILE LOCALLY:
-1. run remakeexecutable.sh
-2. make the changes you want to make locally
-3. open cmd and navigate to the root directory
-4. go to dist folder and run the .exe file
-5. go to root directory and delete the build folder
-6. Enjoy your fully custom app!
+
+1. Download the codebase from this repository
+1. make the changes you want to see
+1. Run the app.py file using python in terminal
+```
+cd path/to/root/directory
+cd app
+python app.py
+```
+3. Open your browser and navigate to http://localhost:5000 to test
+4. Run the 'remakeexecutable.sh' file in terminal to create a new executable file
+5. Run the new executable file to test
+6. ENJOY!
 
 
 # HOW TO USE: (syntax)
