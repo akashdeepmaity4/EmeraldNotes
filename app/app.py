@@ -6,18 +6,25 @@ from flask import render_template as r
 from werkzeug.utils import secure_filename
 
 #deploying as executable application
+
 def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and PyInstaller."""
     try:
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        if os.path.basename(base_path) == 'app':
+            base_path = os.path.dirname(base_path)
     return os.path.join(base_path, relative_path)
 
 app = Flask(__name__,
             template_folder=resource_path('templates'),
             static_folder=resource_path('static'))
 
-STORAGE_DIR = os.path.join(os.path.dirname(__file__), 'storage')
+
+'''attention here: storage directory'''
+STORAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)),'storage') #CHNAGE THIS LINE TO CHANGE STORAGE LOCATION
+
 if not os.path.exists(STORAGE_DIR):
     os.makedirs(STORAGE_DIR)
 

@@ -3,22 +3,25 @@
 {% block title %}Emerald Notes - Editor{% endblock %}
 
 {% block content %}
-<div class="editor-wrapper">
+<div class="editor-workspace">
+    <!-- Left Toolbar (kept exactly as original) -->
     <div class="toolbar-left">
-        <a href="{{ url_for('new_project') }}" class="pill-btn">New</a>
-        <button id="save-btn" class="pill-btn">Save</button>
+        <a href="{{ url_for('new_project') }}" class="pill-btn">New Page</a>
         <button id="preview-btn" class="pill-btn">Preview</button>
+        <button id="save-btn" class="pill-btn">Save</button>
     </div>
 
-    <div class="editor-container">
+    <!-- Center Editor (kept exactly as original) -->
+    <div class="editor-canvas-container">
         <textarea id="editor-textarea" placeholder="Start typing here...">{{ content }}</textarea>
         <div id="preview-container" class="preview-viewport" style="display: none;"></div>
     </div>
-
-    <div class="toolbar-right">
-        <div class="format-group">
-            <label>Heading</label>
-            <select id="heading-select">
+    <div class="instructions-panel" style="width: 200px; text-align: left; padding: 15px 12px;">
+        <h3 style="text-align: center;">Formatting</h3>
+        
+        <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px;">Heading</label>
+            <select id="heading-select" style="width: 100%; padding: 4px 6px; border-radius: 4px; border: 1px solid #ccc; background: var(--input-bg); color: var(--text-color);">
                 <option value="">Normal</option>
                 <option value="h1">H1</option>
                 <option value="h2">H2</option>
@@ -29,38 +32,48 @@
             </select>
         </div>
 
-        <div class="format-group">
-            <label>Text Style</label>
-            <button class="format-btn" data-command="bold"><b>Bold</b></button>
-            <button class="format-btn" data-command="italic"><i>Italic</i></button>
-            <button class="format-btn" data-command="strike"><s>Strike</s></button>
-            <button class="format-btn" data-command="code">Code</button>
+        <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px;">Text Style</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <button class="format-btn" data-command="bold" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;"><b>B</b></button>
+                <button class="format-btn" data-command="italic" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;"><i>I</i></button>
+                <button class="format-btn" data-command="strike" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;"><s>S</s></button>
+                <button class="format-btn" data-command="code" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">{ }</button>
+            </div>
         </div>
 
-        <div class="format-group">
-            <label>Lists</label>
-            <button class="format-btn" data-command="bullet">• Bullet</button>
-            <button class="format-btn" data-command="number">1. Numbered</button>
-            <button class="format-btn" data-command="task">☐ Task</button>
-            <button class="format-btn" data-command="taskdone">☑ Done</button>
+        <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px;">Lists</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <button class="format-btn" data-command="bullet" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">•</button>
+                <button class="format-btn" data-command="number" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">1.</button>
+                <button class="format-btn" data-command="task" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">☐</button>
+                <button class="format-btn" data-command="taskdone" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">☑</button>
+            </div>
         </div>
 
-        <div class="format-group">
-            <label>Block</label>
-            <button class="format-btn" data-command="quote">″ Quote</button>
-            <button class="format-btn" data-command="codeblock">{ } Code Block</button>
-            <button class="format-btn" data-command="hr">— Divider</button>
+        <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px;">Block</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <button class="format-btn" data-command="quote" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">″</button>
+                <button class="format-btn" data-command="codeblock" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">{ }</button>
+                <button class="format-btn" data-command="hr" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">—</button>
+            </div>
         </div>
 
-        <div class="format-group">
-            <label>Insert</label>
-            <button class="format-btn" data-command="link">🔗 Link</button>
-            <button class="format-btn" data-command="img">🖼 Image</button>
+        <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px;">Insert</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <button class="format-btn" data-command="link" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">🔗</button>
+                <button class="format-btn" data-command="img" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">🖼</button>
+            </div>
         </div>
 
-        <div class="format-group">
-            <label>Tools</label>
-            <button class="format-btn" data-command="clear">✖ Clear Formatting</button>
+        <div style="margin-bottom: 0;">
+            <label style="display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px;">Tools</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <button class="format-btn" data-command="clear" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">✖ Clear</button>
+            </div>
         </div>
     </div>
 </div>
