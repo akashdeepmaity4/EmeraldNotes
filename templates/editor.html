@@ -3,25 +3,65 @@
 {% block title %}Emerald Notes - Editor{% endblock %}
 
 {% block content %}
-<div class="editor-workspace">
+<div class="editor-wrapper">
     <div class="toolbar-left">
-        <a href="{{ url_for('new_project') }}" class="pill-btn">New Page</a>
-        <button id="resize-btn" class="pill-btn">Resize</button>
-        <button id="preview-btn" class="pill-btn">Preview</button>
+        <a href="{{ url_for('new_project') }}" class="pill-btn">New</a>
         <button id="save-btn" class="pill-btn">Save</button>
+        <button id="preview-btn" class="pill-btn">Preview</button>
     </div>
 
-    <div class="editor-canvas-container">
+    <div class="editor-container">
         <textarea id="editor-textarea" placeholder="Start typing here...">{{ content }}</textarea>
-
         <div id="preview-container" class="preview-viewport" style="display: none;"></div>
     </div>
 
-    <div class="instructions-panel">
-        <h3>How to use</h3>
-        <p>Write plain content Text as it is.</p>
-        <p>Use <code>*</code> before text to convert to command.</p>
-        <p>Use <code>**</code> before word to use command as plain text.</p>
+    <div class="toolbar-right">
+        <div class="format-group">
+            <label>Heading</label>
+            <select id="heading-select">
+                <option value="">Normal</option>
+                <option value="h1">H1</option>
+                <option value="h2">H2</option>
+                <option value="h3">H3</option>
+                <option value="h4">H4</option>
+                <option value="h5">H5</option>
+                <option value="h6">H6</option>
+            </select>
+        </div>
+
+        <div class="format-group">
+            <label>Text Style</label>
+            <button class="format-btn" data-command="bold"><b>Bold</b></button>
+            <button class="format-btn" data-command="italic"><i>Italic</i></button>
+            <button class="format-btn" data-command="strike"><s>Strike</s></button>
+            <button class="format-btn" data-command="code">Code</button>
+        </div>
+
+        <div class="format-group">
+            <label>Lists</label>
+            <button class="format-btn" data-command="bullet">• Bullet</button>
+            <button class="format-btn" data-command="number">1. Numbered</button>
+            <button class="format-btn" data-command="task">☐ Task</button>
+            <button class="format-btn" data-command="taskdone">☑ Done</button>
+        </div>
+
+        <div class="format-group">
+            <label>Block</label>
+            <button class="format-btn" data-command="quote">″ Quote</button>
+            <button class="format-btn" data-command="codeblock">{ } Code Block</button>
+            <button class="format-btn" data-command="hr">— Divider</button>
+        </div>
+
+        <div class="format-group">
+            <label>Insert</label>
+            <button class="format-btn" data-command="link">🔗 Link</button>
+            <button class="format-btn" data-command="img">🖼 Image</button>
+        </div>
+
+        <div class="format-group">
+            <label>Tools</label>
+            <button class="format-btn" data-command="clear">✖ Clear Formatting</button>
+        </div>
     </div>
 </div>
 
