@@ -5,6 +5,7 @@ Emerald Notes is a simple Markdown editor that allows you to create and edit Mar
 
 1. It is completely local, meaning you can access your files at any time
 1. It is very lightweight, suitable for mobile devices or low-end computers.
+1. Both executable application as well as localhost webapp available.
 
 #### As I myself am a student, I will be using this exact codebase for my personal notetaking in college or just during self-study. I will keep this codebase updated and implement new features as I learn more and more throughout my academic journey.
 
