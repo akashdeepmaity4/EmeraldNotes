@@ -1,4 +1,4 @@
-# Emerald Notes
+<center><h1>Emerald Notes</h1></center>
 
 ## About
 Emerald Notes is a simple Markdown editor that allows you to create and edit Markdown files.
@@ -14,6 +14,11 @@ Emerald Notes is a simple Markdown editor that allows you to create and edit Mar
 - Dark mode
 
 ## How to Use
+
+1. Download 'LaunchEmeraldNotesApp.exe' from the root directory and run it
+
+<h2>OR</h2>
+
 1. Download the codebase from this repository
 1. Run the app.py file using python in terminal
 ```
@@ -24,12 +29,21 @@ python app.py
 ## Dependencies
 - Python 3.x
 - Flask
+- pyinstaller
+- pywebview
 - Jinja2
 
+### Install Dependencies
 ```
-#installing the dependencies at once
 pip install -r requirements.txt
 ```
+# HOW TO EDIT FILE LOCALLY:
+1. run remakeexecutable.sh
+2. make the changes you want to make locally
+3. open cmd and navigate to the root directory
+4. go to dist folder and run the .exe file
+5. go to root directory and delete the build folder
+6. Enjoy your fully custom app!
 
 
 # HOW TO USE: (syntax)
