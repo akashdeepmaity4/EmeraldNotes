@@ -22,8 +22,17 @@ app = Flask(__name__,
             static_folder=resource_path('static'))
 
 
+
+
+
 '''attention here: storage directory'''
 STORAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)),'storage') #CHNAGE THIS LINE TO CHANGE STORAGE LOCATION
+
+
+
+
+
+
 
 if not os.path.exists(STORAGE_DIR):
     os.makedirs(STORAGE_DIR)
@@ -49,8 +58,8 @@ def parse(text):
             in_ordered_list = False
         return res
 
-    for line in lines:
-        stripped = line.strip()
+    for each in lines:
+        stripped = each.strip()
 
         if stripped.startswith("```"):
             if in_code_block:
@@ -238,8 +247,6 @@ def to_markdown(text):
     return "\n".join(out)
 
 def get_preview(content, max_chars=140):
-    """Strip basic Markdown syntax and return a short plain-text snippet
-    for the dashboard card preview."""
     snippet_lines = []
     for line in content.splitlines():
         stripped = line.strip()
