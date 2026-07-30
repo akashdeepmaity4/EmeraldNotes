@@ -11,6 +11,8 @@ except ImportError as e:
     print(f"Import error: {e}")
     print("Files in current directory:", os.listdir('.'))
     sys.exit(1)
+else:
+    print("ERROR: check launcher.py")
 
 if __name__ == '__main__':
     webview.create_window('Emerald Notes', app)
