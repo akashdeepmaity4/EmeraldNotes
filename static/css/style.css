@@ -10,6 +10,8 @@
     --header-text: #e8e3d9;
     --sidebar-bg: #f5f3ed;
     --input-bg: #ffffff;
+    --modal-overlay: rgba(0,0,0,0.5);
+    --modal-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
 body.dark-mode {
@@ -24,6 +26,8 @@ body.dark-mode {
     --header-text: #e8e3d9;
     --sidebar-bg: #ffffff;
     --input-bg: #2a2938;
+    --modal-overlay: rgba(0,0,0,0.7);
+    --modal-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
 * {
@@ -61,6 +65,7 @@ body {
     display: inline-block;
 }
 
+
 .nav-right {
     display: flex;
     align-items: center;
@@ -89,6 +94,9 @@ body {
     border-radius: 34px;
 }
 
+.slider:hover {
+    transform: scale(1.2);}
+
 .slider:before {
     position: absolute;
     content: "";
@@ -110,6 +118,7 @@ input:checked + .slider:before {
 }
 
 .user-icon {
+    position: relative;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -118,7 +127,155 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
     color: white;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
 }
+
+.user-icon:hover {
+    transform: scale(1.2);
+}
+
+.user-icon .badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: #4a9eff;
+    color: white;
+    font-size: 10px;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--header-bg);
+    pointer-events: none;
+}
+
+/* ---- Path Selector Modal ---- */
+.path-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--modal-overlay);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+.path-modal {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 16px;
+    padding: 32px;
+    min-width: 420px;
+    max-width: 90vw;
+    box-shadow: var(--modal-shadow);
+    animation: slideUp 0.25s ease;
+}
+
+.path-modal h3 {
+    margin: 0 0 4px 0;
+    font-size: 20px;
+    color: var(--text-color);
+}
+
+.path-modal .sub-text {
+    margin: 0 0 20px 0;
+    color: var(--text-color);
+    opacity: 0.7;
+    font-size: 14px;
+}
+
+.path-input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.path-input-group input {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--input-bg);
+    color: var(--text-color);
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Consolas', monospace;
+    transition: border-color 0.2s;
+}
+
+.path-input-group input:focus {
+    outline: none;
+    border-color: #4a9eff;
+}
+
+.path-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.path-actions .cancel-btn,
+.path-actions .save-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+
+.path-actions .cancel-btn {
+    background: var(--pill-bg);
+    color: var(--pill-text);
+    box-shadow: var(--pill-shadow);
+}
+
+.path-actions .save-btn {
+    background: #4a9eff;
+    color: white;
+    box-shadow: 0 4px 6px rgba(74, 158, 255, 0.3);
+}
+
+.path-actions .cancel-btn:hover,
+.path-actions .save-btn:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+    
+}
+
+.path-hint {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--card-border);
+    opacity: 0.7;
+}
+
+.path-hint code {
+    background: var(--input-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-color);
+    word-break: break-all;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Existing styles below (unchanged) ---- */
 
 .editor-workspace {
     display: flex;
