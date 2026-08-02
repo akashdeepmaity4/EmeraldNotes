@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ============================
-    // 1. THEME TOGGLE (works everywhere)
-    // ============================
     const themeToggle = document.getElementById('theme-toggle');
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
@@ -14,9 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ============================
-    // 2. EDITOR FEATURES (only on pages with #editor-textarea)
-    // ============================
     const editorArea = document.getElementById('editor-textarea');
     if (editorArea) {
         const previewContainer = document.getElementById('preview-container');
@@ -27,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let previewVisible = false;
 
-        // ---- wrapWithCommand (unchanged) ----
         function wrapWithCommand(command, arg) {
             const start = editorArea.selectionStart;
             const end = editorArea.selectionEnd;
@@ -117,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
             editorArea.focus();
         }
 
-        // ---- Heading select ----
         if (headingSelect) {
             headingSelect.addEventListener('change', () => {
                 const val = headingSelect.value;
@@ -128,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // ---- Format buttons ----
         document.querySelectorAll('.format-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const command = btn.dataset.command;
@@ -137,7 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // ---- Preview toggle ----
         function togglePreview() {
             if (previewVisible) {
                 editorArea.style.display = 'block';
@@ -166,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
             previewBtn.addEventListener('click', togglePreview);
         }
 
-        // ---- Keyboard shortcut for preview ----
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'v') {
                 e.preventDefault();
@@ -174,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // ---- Save button ----
         if (saveBtn) {
             saveBtn.addEventListener('click', () => {
                 let filename = filenameInput.value.trim();
@@ -203,11 +191,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(err => console.error('Save error:', err));
             });
         }
-    } // end if editorArea
+    } 
 
-    // ============================
-    // 3. PATH SELECTOR (works everywhere)
-    // ============================
+
+    
     const profileLogo = document.getElementById('profileLogo');
     const modal = document.getElementById('pathModal');
     const cancelBtn = document.getElementById('cancelPathBtn');
