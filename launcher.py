@@ -4,6 +4,8 @@ import webview
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+
+
 try:
     from app.app import app
     print("Successfully imported app from app.app")

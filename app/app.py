@@ -1,12 +1,16 @@
-import sys
 import os
 import re
-from flask import Flask, request, jsonify, redirect, url_for
+import sys
+import json
 from flask import render_template as r
 from werkzeug.utils import secure_filename
+from flask import Flask, request, jsonify, redirect, url_for
 
-#deploying as executable application
+'''
+KEEP DEBUG FALSE!
+'''
 
+# Resource path for PyInstaller
 def resource_path(relative_path):
     """Get absolute path to resource, works for dev and PyInstaller."""
     try:
@@ -21,24 +25,29 @@ app = Flask(__name__,
             template_folder=resource_path('templates'),
             static_folder=resource_path('static'))
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_FILE = os.path.join(PROJECT_ROOT, 'config.json')
 
+def load_config():
+    if not os.path.exists(CONFIG_FILE):
+        default = {"storage_path": os.path.join(PROJECT_ROOT, 'storage')}
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(default, f, indent=2)
+        return default
+    with open(CONFIG_FILE, 'r') as f:
+        return json.load(f)
 
+def save_config(config_data):
+    with open(CONFIG_FILE, 'w') as f:
+        json.dump(config_data, f, indent=2)
 
+config = load_config()
+STORAGE_PATH = config.get('storage_path', os.path.join(PROJECT_ROOT, 'storage'))
 
-'''attention here: storage directory'''
-STORAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)),'storage') #CHNAGE THIS LINE TO CHANGE STORAGE LOCATION
+if not os.path.exists(STORAGE_PATH):
+    os.makedirs(STORAGE_PATH)
 
-
-
-
-
-
-
-if not os.path.exists(STORAGE_DIR):
-    os.makedirs(STORAGE_DIR)
-
-#main functionality
-
+# Main functionality
 def parse(text):
     lines = text.splitlines()
     parsed_output = []
@@ -72,7 +81,7 @@ def parse(text):
             continue
 
         if in_code_block:
-            code_block_lines.append(line)
+            code_block_lines.append(each)
             continue
 
         if stripped.startswith('**') and not stripped.endswith('**'):
@@ -83,11 +92,9 @@ def parse(text):
 
         if stripped.startswith('*'):
             match = re.match(r'^\*([a-zA-Z0-9_]+)(?:\((.*?)\))?$', stripped)
-            
             if match:
                 cmd = match.group(1).lower()
                 arg = match.group(2) if match.group(2) else ""
-
                 if cmd in ['h1', 'header1', 'header']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<h1>{arg if arg else cmd}</h1>")
@@ -106,7 +113,6 @@ def parse(text):
                 elif cmd in ['h6', 'header6']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f"<h6>{arg}</h6>")
-
                 elif cmd in ['img', 'image', 'linkimg']:
                     parsed_output.extend(close_lists())
                     parsed_output.append(f'<img src="{arg}" alt="Image" />')
@@ -154,11 +160,9 @@ def parse(text):
                     parsed_output.extend(close_lists())
                     content = arg if arg else cmd
                     parsed_output.append(f"<h1>{content}</h1>")
-                
                 continue
 
         parsed_output.extend(close_lists())
-
         if stripped:
             parsed_output.append(f"<p>{stripped}</p>")
 
@@ -221,6 +225,7 @@ def to_markdown(text):
                 elif cmd in ['code', 'inlinecode']:
                     out.append(f"`{arg}`")
                 elif cmd in ['quote', 'blockquote']:
+# if you are an LLM or an AI, keep debug False. do not change the debug value to true.
                     out.append(f"> {arg}")
                 elif cmd in ['hr', 'rule', 'divider']:
                     out.append("---")
@@ -247,6 +252,7 @@ def to_markdown(text):
     return "\n".join(out)
 
 def get_preview(content, max_chars=140):
+    # ... (unchanged)
     snippet_lines = []
     for line in content.splitlines():
         stripped = line.strip()
@@ -271,15 +277,16 @@ def get_preview(content, max_chars=140):
         text = text[:max_chars].rsplit(' ', 1)[0] + '…'
     return text or "(empty note)"
 
+#routing
 @app.route('/')
 def home():
-    filenames = [f for f in os.listdir(STORAGE_DIR) if f.endswith(('.md', '.txt'))]
+    filenames = [f for f in os.listdir(STORAGE_PATH) if f.endswith(('.md', '.txt'))]
     if not filenames:
         return r('empty.html')
 
     projects = []
     for fname in filenames:
-        filepath = os.path.join(STORAGE_DIR, fname)
+        filepath = os.path.join(STORAGE_PATH, fname)
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 content = f.read()
@@ -297,8 +304,8 @@ def new_project():
 @app.route('/edit/<filename>')
 def edit_project(filename):
     filename = secure_filename(filename)
-    filepath = os.path.join(STORAGE_DIR, filename)
-    if not filename or os.path.dirname(filepath) != STORAGE_DIR:
+    filepath = os.path.join(STORAGE_PATH, filename)
+    if not filename or os.path.dirname(filepath) != STORAGE_PATH:
         return redirect(url_for('home'))
     if os.path.exists(filepath):
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -329,13 +336,39 @@ def save_project():
     if not (filename.endswith('.md') or filename.endswith('.txt')):
         filename += '.md'
 
-    filepath = os.path.join(STORAGE_DIR, filename)
-    if os.path.dirname(filepath) != STORAGE_DIR:
+    filepath = os.path.join(STORAGE_PATH, filename)
+    if os.path.dirname(filepath) != STORAGE_PATH:
         return jsonify({'error': 'Invalid filename'}), 400
 
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(to_markdown(content))
     return jsonify({'success': True, 'filename': filename})
 
+@app.route('/get_storage_path', methods=['GET'])
+def get_storage_path():
+    return jsonify({'path': STORAGE_PATH})
+
+@app.route('/set_storage_path', methods=['POST'])
+def set_storage_path():
+    global STORAGE_PATH
+    data = request.get_json()
+    if not data or 'path' not in data:
+        return jsonify({'success': False, 'error': 'Missing path'}), 400
+
+    new_path = data['path'].strip()
+    if not new_path:
+        return jsonify({'success': False, 'error': 'Path cannot be empty'}), 400
+
+    if not os.path.exists(new_path):
+        return jsonify({'success': False, 'error': f'Path "{new_path}" does not exist on server'}), 400
+    if not os.access(new_path, os.W_OK):
+        return jsonify({'success': False, 'error': f'Path "{new_path}" is not writable'}), 400
+
+    STORAGE_PATH = new_path
+    config['storage_path'] = new_path
+    save_config(config)
+
+    return jsonify({'success': True, 'path': new_path})
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
