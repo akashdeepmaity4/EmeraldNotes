@@ -10,6 +10,7 @@ Emerald Notes is a simple Markdown editor that allows you to create and edit Mar
 #### As I myself am a student, I will be using this exact codebase combined with my second repository 'diagramappfornotes' for my personal notetaking in college or just during self-study. I will be keeping this codebase updated and implement new features as I learn more and more throughout my Computer Science journey.
 
 ## Features
+
 - Markdown support
 - Custom commands
 - Dark mode
