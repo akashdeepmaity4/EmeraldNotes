@@ -29,23 +29,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const after = editorArea.value.substring(end);
 
             let replacement = '';
+            const applyReplacement = (cursorStart = start + replacement.length, cursorEnd = cursorStart) => {
+                editorArea.value = before + replacement + after;
+                editorArea.selectionStart = cursorStart;
+                editorArea.selectionEnd = cursorEnd;
+                editorArea.focus();
+
+                fetch('/api/parse', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: editorArea.value })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    previewContainer.innerHTML = data.html;
+                })
+                .catch(err => console.error('Error parsing text:', err));
+            };
 
             if (command === 'codeblock') {
-                const text = selectedText || 'your code here';
+                const text = selectedText;
                 replacement = '```\n' + text + '\n```';
-                editorArea.value = before + replacement + after;
-                const newCursor = start + replacement.length;
-                editorArea.selectionStart = editorArea.selectionEnd = newCursor;
-                editorArea.focus();
+                const newCursor = selectedText ? start + replacement.length : start + 4;
+                applyReplacement(newCursor);
                 return;
             }
             if (command === 'hr') {
                 const prefix = before.endsWith('\n') || before === '' ? '' : '\n';
                 replacement = prefix + '---\n';
-                editorArea.value = before + replacement + after;
-                const newCursor = start + replacement.length;
-                editorArea.selectionStart = editorArea.selectionEnd = newCursor;
-                editorArea.focus();
+                applyReplacement();
                 return;
             }
             if (command === 'link') {
@@ -53,69 +65,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!url) return;
                 const text = selectedText || url;
                 replacement = `[${text}](${url})`;
-                editorArea.value = before + replacement + after;
-                const newCursor = start + replacement.length;
-                editorArea.selectionStart = editorArea.selectionEnd = newCursor;
-                editorArea.focus();
+                applyReplacement();
                 return;
             }
             if (command === 'img') {
                 const url = prompt('Enter image URL:');
                 if (!url) return;
                 replacement = `![Image](${url})`;
-                editorArea.value = before + replacement + after;
-                const newCursor = start + replacement.length;
-                editorArea.selectionStart = editorArea.selectionEnd = newCursor;
-                editorArea.focus();
+                applyReplacement();
                 return;
             }
             if (command === 'clear') {
                 const stripped = selectedText;
                 replacement = stripped;
-                editorArea.value = before + replacement + after;
-                const newCursor = start + replacement.length;
-                editorArea.selectionStart = editorArea.selectionEnd = newCursor;
-                editorArea.focus();
+                applyReplacement();
                 return;
             }
             if (['bullet', 'number', 'task', 'taskdone'].includes(command)) {
-                const lines = selectedText.split('\n');
-                const wrappedLines = lines.map(line => {
-                    const trimmed = line.trim();
-                    if (!trimmed) return line;
-                    if (command === 'bullet') return `- ${trimmed}`;
-                    if (command === 'number') return `1. ${trimmed}`;
-                    if (command === 'task') return `- [ ] ${trimmed}`;
-                    return `- [x] ${trimmed}`;
-                });
-                replacement = wrappedLines.join('\n');
-                editorArea.value = before + replacement + after;
-                const newCursor = start + replacement.length;
-                editorArea.selectionStart = editorArea.selectionEnd = newCursor;
+                const lineStart = editorArea.value.lastIndexOf('\n', start - 1) + 1;
+                const prefix = command === 'bullet' ? '- ' : command === 'number' ? '1. ' : command === 'task' ? '- [ ] ' : '- [x] ';
+                replacement = prefix;
+                editorArea.value = editorArea.value.substring(0, lineStart) + replacement + editorArea.value.substring(lineStart);
+                editorArea.selectionStart = start + replacement.length;
+                editorArea.selectionEnd = end + replacement.length;
                 editorArea.focus();
+                fetch('/api/parse', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: editorArea.value })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    previewContainer.innerHTML = data.html;
+                })
+                .catch(err => console.error('Error parsing text:', err));
                 return;
             }
             if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'quote', 'bold', 'italic', 'strike', 'code'].includes(command)) {
-                const text = selectedText || command;
-                if (command.startsWith('h')) replacement = `${'#'.repeat(Number(command[1]))} ${text}`;
-                else if (command === 'quote') replacement = `> ${text}`;
+                const text = selectedText;
+                if (command.startsWith('h')) {
+                    const lineStart = editorArea.value.lastIndexOf('\n', start - 1) + 1;
+                    replacement = `${'#'.repeat(Number(command[1]))} `;
+                    editorArea.value = editorArea.value.substring(0, lineStart) + replacement + editorArea.value.substring(lineStart);
+                    editorArea.selectionStart = start + replacement.length;
+                    editorArea.selectionEnd = end + replacement.length;
+                    editorArea.focus();
+                    fetch('/api/parse', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: editorArea.value })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        previewContainer.innerHTML = data.html;
+                    })
+                    .catch(err => console.error('Error parsing text:', err));
+                    return;
+                }
+                if (command === 'quote') replacement = `> ${text}`;
                 else if (command === 'bold') replacement = `**${text}**`;
                 else if (command === 'italic') replacement = `*${text}*`;
                 else if (command === 'strike') replacement = `~~${text}~~`;
                 else replacement = `\`${text}\``;
-                editorArea.value = before + replacement + after;
-                const newCursor = start + replacement.length;
-                editorArea.selectionStart = editorArea.selectionEnd = newCursor;
-                editorArea.focus();
+                const newCursor = !selectedText && command === 'bold' ? start + 2 : !selectedText && command === 'italic' ? start + 1 : start + replacement.length;
+                applyReplacement(newCursor);
                 return;
             }
 
             const text = selectedText || command;
             replacement = text;
-            editorArea.value = before + replacement + after;
-            const newCursor = start + replacement.length;
-            editorArea.selectionStart = editorArea.selectionEnd = newCursor;
-            editorArea.focus();
+            applyReplacement();
         }
 
         if (headingSelect) {
