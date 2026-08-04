@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (command === 'hr') {
                 const prefix = before.endsWith('\n') || before === '' ? '' : '\n';
-                replacement = prefix + '*hr\n';
+                replacement = prefix + '---\n';
                 editorArea.value = before + replacement + after;
                 const newCursor = start + replacement.length;
                 editorArea.selectionStart = editorArea.selectionEnd = newCursor;
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const url = prompt('Enter URL:');
                 if (!url) return;
                 const text = selectedText || url;
-                replacement = `*link(${text})`;
+                replacement = `[${text}](${url})`;
                 editorArea.value = before + replacement + after;
                 const newCursor = start + replacement.length;
                 editorArea.selectionStart = editorArea.selectionEnd = newCursor;
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (command === 'img') {
                 const url = prompt('Enter image URL:');
                 if (!url) return;
-                replacement = `*img(${url})`;
+                replacement = `![Image](${url})`;
                 editorArea.value = before + replacement + after;
                 const newCursor = start + replacement.length;
                 editorArea.selectionStart = editorArea.selectionEnd = newCursor;
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             if (command === 'clear') {
-                const stripped = selectedText.replace(/\*[a-zA-Z0-9_]+\(([^)]*)\)/g, '$1');
+                const stripped = selectedText;
                 replacement = stripped;
                 editorArea.value = before + replacement + after;
                 const newCursor = start + replacement.length;
@@ -83,7 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const wrappedLines = lines.map(line => {
                     const trimmed = line.trim();
                     if (!trimmed) return line;
-                    return `*${command}(${trimmed})`;
+                    if (command === 'bullet') return `- ${trimmed}`;
+                    if (command === 'number') return `1. ${trimmed}`;
+                    if (command === 'task') return `- [ ] ${trimmed}`;
+                    return `- [x] ${trimmed}`;
                 });
                 replacement = wrappedLines.join('\n');
                 editorArea.value = before + replacement + after;
@@ -94,7 +97,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'quote', 'bold', 'italic', 'strike', 'code'].includes(command)) {
                 const text = selectedText || command;
-                replacement = `*${command}(${text})`;
+                if (command.startsWith('h')) replacement = `${'#'.repeat(Number(command[1]))} ${text}`;
+                else if (command === 'quote') replacement = `> ${text}`;
+                else if (command === 'bold') replacement = `**${text}**`;
+                else if (command === 'italic') replacement = `*${text}*`;
+                else if (command === 'strike') replacement = `~~${text}~~`;
+                else replacement = `\`${text}\``;
                 editorArea.value = before + replacement + after;
                 const newCursor = start + replacement.length;
                 editorArea.selectionStart = editorArea.selectionEnd = newCursor;
@@ -103,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const text = selectedText || command;
-            replacement = `*${command}(${text})`;
+            replacement = text;
             editorArea.value = before + replacement + after;
             const newCursor = start + replacement.length;
             editorArea.selectionStart = editorArea.selectionEnd = newCursor;
