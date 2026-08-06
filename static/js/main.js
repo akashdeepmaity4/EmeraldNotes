@@ -20,6 +20,72 @@ document.addEventListener('DOMContentLoaded', () => {
         const headingSelect = document.getElementById('heading-select');
 
         let previewVisible = false;
+        let hasUnsavedChanges = false;
+        let lastAutosaveLineCount = editorArea.value.split('\n').length;
+        let autosaveInProgress = false;
+
+        function saveDocument({ saveAs = false, silent = false } = {}) {
+            let filename = filenameInput.value.trim();
+            if (saveAs || !filename) {
+                filename = prompt(
+                    'Enter a filename for your project:',
+                    saveAs ? (filename || 'note1.txt') : 'note1.txt'
+                );
+                if (!filename) return Promise.resolve(false);
+            }
+
+            return fetch('/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: filename,
+                    content: editorArea.value
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    if (!silent) alert('Save failed: ' + data.error);
+                    return false;
+                }
+
+                filenameInput.value = data.filename;
+                hasUnsavedChanges = false;
+                lastAutosaveLineCount = editorArea.value.split('\n').length;
+                if (!silent) alert('Saved successfully!');
+                return true;
+            })
+            .catch(err => {
+                console.error('Save error:', err);
+                if (!silent) alert('Could not save the file. See console.');
+                return false;
+            });
+        }
+
+        function createNewDocument() {
+            const newPageUrl = document.querySelector('.toolbar-left a.pill-btn')?.href || '/new';
+            if (!hasUnsavedChanges || !editorArea.value.trim()) {
+                window.location.href = newPageUrl;
+                return;
+            }
+
+            saveDocument().then(saved => {
+                if (saved) window.location.href = newPageUrl;
+            });
+        }
+
+        function updatePreview() {
+            fetch('/api/parse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: editorArea.value })
+            })
+            .then(res => res.json())
+            .then(data => {
+                previewContainer.innerHTML = data.html;
+            })
+            .catch(err => console.error('Error parsing text:', err));
+        }
 
         function wrapWithCommand(command, arg) {
             const start = editorArea.selectionStart;
@@ -34,17 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 editorArea.selectionStart = cursorStart;
                 editorArea.selectionEnd = cursorEnd;
                 editorArea.focus();
-
-                fetch('/api/parse', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: editorArea.value })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    previewContainer.innerHTML = data.html;
-                })
-                .catch(err => console.error('Error parsing text:', err));
+                updatePreview();
             };
 
             if (command === 'codeblock') {
@@ -57,21 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (command === 'hr') {
                 const prefix = before.endsWith('\n') || before === '' ? '' : '\n';
                 replacement = prefix + '---\n';
-                applyReplacement();
-                return;
-            }
-            if (command === 'link') {
-                const url = prompt('Enter URL:');
-                if (!url) return;
-                const text = selectedText || url;
-                replacement = `[${text}](${url})`;
-                applyReplacement();
-                return;
-            }
-            if (command === 'img') {
-                const url = prompt('Enter image URL:');
-                if (!url) return;
-                replacement = `![Image](${url})`;
                 applyReplacement();
                 return;
             }
@@ -89,16 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 editorArea.selectionStart = start + replacement.length;
                 editorArea.selectionEnd = end + replacement.length;
                 editorArea.focus();
-                fetch('/api/parse', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: editorArea.value })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    previewContainer.innerHTML = data.html;
-                })
-                .catch(err => console.error('Error parsing text:', err));
+                updatePreview();
                 return;
             }
             if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'quote', 'bold', 'italic', 'strike', 'code'].includes(command)) {
@@ -110,16 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     editorArea.selectionStart = start + replacement.length;
                     editorArea.selectionEnd = end + replacement.length;
                     editorArea.focus();
-                    fetch('/api/parse', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: editorArea.value })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        previewContainer.innerHTML = data.html;
-                    })
-                    .catch(err => console.error('Error parsing text:', err));
+                    updatePreview();
                     return;
                 }
                 if (command === 'quote') replacement = `> ${text}`;
@@ -183,7 +206,36 @@ document.addEventListener('DOMContentLoaded', () => {
             previewBtn.addEventListener('click', togglePreview);
         }
 
+        editorArea.addEventListener('input', () => {
+            hasUnsavedChanges = true;
+            const currentLineCount = editorArea.value.split('\n').length;
+            if (
+                filenameInput.value.trim() &&
+                !autosaveInProgress &&
+                currentLineCount - lastAutosaveLineCount >= 20
+            ) {
+                autosaveInProgress = true;
+                saveDocument({ silent: true }).finally(() => {
+                    autosaveInProgress = false;
+                });
+            }
+        });
+
         document.addEventListener('keydown', (e) => {
+            if (!e.ctrlKey) return;
+
+            if (e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                createNewDocument();
+                return;
+            }
+
+            if (e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                saveDocument({ saveAs: e.shiftKey });
+                return;
+            }
+
             if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'v') {
                 e.preventDefault();
                 togglePreview();
@@ -192,30 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (saveBtn) {
             saveBtn.addEventListener('click', () => {
-                let filename = filenameInput.value.trim();
-                if (!filename) {
-                    filename = prompt("Enter a filename for your project:", "note1.md");
-                    if (!filename) return;
-                }
-
-                fetch('/api/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        filename: filename,
-                        content: editorArea.value
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        filenameInput.value = data.filename;
-                        alert('Saved successfully!');
-                    } else {
-                        alert('Save failed: ' + data.error);
-                    }
-                })
-                .catch(err => console.error('Save error:', err));
+                saveDocument();
             });
         }
     } 
@@ -229,20 +258,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const pathInput = document.getElementById('storagePathInput');
     const currentPathDisplay = document.getElementById('currentPathDisplay');
 
+    function openPathModal() {
+        if (!modal) return;
+
+        fetch('/get_storage_path')
+            .then(res => res.json())
+            .then(data => {
+                currentPathDisplay.textContent = data.path;
+                pathInput.value = data.path;
+                modal.style.display = 'flex';
+            })
+            .catch(err => {
+                console.error('Failed to load path:', err);
+                alert('Could not load current storage path.');
+            });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key.toLowerCase() === 'p') {
+            e.preventDefault();
+            openPathModal();
+        }
+    });
+
     if (profileLogo && modal) {
-        profileLogo.addEventListener('click', function() {
-            fetch('/get_storage_path')
-                .then(res => res.json())
-                .then(data => {
-                    currentPathDisplay.textContent = data.path;
-                    pathInput.value = data.path;
-                    modal.style.display = 'flex';
-                })
-                .catch(err => {
-                    console.error('Failed to load path:', err);
-                    alert('Could not load current storage path.');
-                });
-        });
+        profileLogo.addEventListener('click', openPathModal);
 
         if (cancelBtn) {
             cancelBtn.addEventListener('click', function() {
