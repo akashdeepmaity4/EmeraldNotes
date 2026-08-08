@@ -4,19 +4,12 @@
 
 {% block content %}
 <div class="editor-workspace">
-    <!-- Left Toolbar (kept exactly as original) -->
+    <!-- Left Toolbar with formatting panel below save button -->
     <div class="toolbar-left">
         <a href="{{ url_for('new_project') }}" class="pill-btn">New Page</a>
         <button id="preview-btn" class="pill-btn">Preview</button>
         <button id="save-btn" class="pill-btn">Save</button>
-    </div>
-
-    <!-- Center Editor (kept exactly as original) -->
-    <div class="editor-canvas-container">
-        <textarea id="editor-textarea" placeholder="Start typing here...">{{ content }}</textarea>
-        <div id="preview-container" class="preview-viewport" style="display: none;"></div>
-    </div>
-    <div class="instructions-panel" style="width: 200px; text-align: left; padding: 15px 12px;">
+        <div id="format-panel" class="instructions-panel" style="width: 100%; text-align: left; padding: 15px 12px;">
         <h3 style="text-align: center;">Formatting</h3>
         
         <div style="margin-bottom: 12px;">
@@ -67,6 +60,11 @@
                 <button class="format-btn" data-command="clear" style="padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); cursor: pointer;">✖ Clear</button>
             </div>
         </div>
+        </div>
+    </div>
+    <div class="editor-canvas-container">
+        <textarea id="editor-textarea" placeholder="Start typing here...">{{ content }}</textarea>
+        <div id="preview-container" class="preview-viewport" style="display: none;"></div>
     </div>
 </div>
 
