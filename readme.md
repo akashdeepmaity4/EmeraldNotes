@@ -1,59 +1,65 @@
-<center><h1>Emerald Notes</h1></center>
+# EMERALD NOTES
+Emerald Notes is ultra-lightweight standard text editor, weighting a mere 18 MB and taking only 5-10 MB RAM during active use. It allows you to create and edit text files. It is fully local, keeping your files 100% safe inside your own local storage. It also supports native Markdown file formatting using the custom GUI formatting toolbar. 
 
-## About
-Emerald Notes is a simple Markdown editor that allows you to create and edit Markdown files.
+## MUST DO
 
+1. Open the 'remakeexecutable.sh' file in an IDE or text editor and change line 2 to the location where you want the root directory to be. 
+1. Make sure it is the same path as the parent codebase to avoid errors.
+1. install dependencies using the 'requirements.txt' file. [Refer to line 44]
+<br>
+<br>
+<br>
+
+![logo](static/emeraldnoteslogo.png)
+
+
+
+## HIGHLIGHTS
 
 1. It is completely local, meaning you can access your files at any time
 1. It is very lightweight, suitable for mobile devices or low-end computers.
 1. Both executable application as well as localhost webapp available.
 1. Can be locally run on all major OSs, but .exe application can ONLY be run on windows.
 
-#### I will be using this exact codebase combined with my second repository 'diagramappfornotes' for my personal notetaking in college or just during self-study. I will be keeping this codebase updated and implement new features as I learn more and more throughout my Computer Science journey.
 
-## Features
 
-- Markdown support with GUI formatting toolbar
+## FEATURES
+
+- Markdown formatting support with GUI formatting toolbar
 - .exe app, localhost webapp AND local webapp using Pywebview
-- Native Dark mode support throughout
+- Native Dark mode support throughout the app
+
 
 
 ## How to Use
 
-1. Download the codebase, run 'remakeexecutable.sh' via Bash to make a safe application.
+1. Download the codebase to a directory named 'emeraldnotes'. This will act as the root directory.
+1. Open 'remakeexecutable.sh' and change line 2 to the location of emeraldnotes root directory. 
+1. Run 'remakeexecutable.sh' via Bash to make a safe application.
 
-<h2>OR</h2>
+### OR
 
-1. Download the codebase from this repository
-1. Run the launcher.py file using python in Command Prompt/ Bourne Again Shell
+1. Download the codebase to a directory named 'emeraldnotes'. This will act as the root directory.
+1. Run 'launcher.py' via python in Command Prompt/ Bourne Again Shell (Bash).
+1. This opens a native webapp.
 
-<h2>OR</h2>
+### OR
 
-1. Download the codebase, and run 'app.py' using python 
-   
-```
-cd path/to/your/root/directory
-cd app
-python app.py
-```
+1. Download the codebase to a directory named 'emeraldnotes'. This will act as the root directory.
+1. Run 'app/app.py' via python.
+1. Navigate to http://localhost:5000 in your browser.
 
-- Example-
 
-  ```
-  C:
-  cd emeraldnotes
-  cd app
-  python app.py
-  ```
-  
-2. Open your browser and navigate to http://localhost:5000
 
 ## Dependencies
-- Python 3.x
-- Flask
-- pyinstaller
-- pywebview
-- Jinja2
+
+- Python 3.x (3.14 recommended)
+- Bash (To automate the application making process. Highly recommended)
+- Flask (Non-Negotiable to run the app)
+- pyinstaller (If you want .exe application)
+- pywebview (If you want to run the Webapp natively)
+
+
 
 ### Install Dependencies
 
@@ -61,11 +67,14 @@ python app.py
 pip install -r requirements.txt
 ```
 
+
+
 # HOW TO EDIT FILE LOCALLY:
 
 1. Download the codebase from this repository.
 1. make the changes you want to see.
 1. Save your changes.
-4. Run the 'remakeexecutable.sh' file in terminal to create a new executable file
-5. Run the new executable file to test
-6. ENJOY!
+1. Open the 'remakeexecutable.sh' file in an IDE or text editor. and change line 2 to the location of emeraldnotes root directory.
+1.  Run the 'remakeexecutable.sh' file in terminal to create a new executable file
+1. Run the new executable file to test
+1. ENJOY!
