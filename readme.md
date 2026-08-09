@@ -18,7 +18,6 @@ Emerald Notes is ultra-lightweight standard text editor, weighting a mere 18 MB 
 
 1. It is completely local, meaning you can access your files at any time
 1. It is very lightweight, suitable for mobile devices or low-end computers.
-1. Both executable application as well as localhost webapp available.
 1. Can be locally run on all major OSs, but .exe application can ONLY be run on windows.
 
 
