@@ -1,0 +1,106 @@
+{
+  "name": "emeraldnotes",
+  "productName": "EmeraldNotes",
+  "version": "1.0.6",
+  "description": "A beautiful markdown notes application with dark theme, real-time preview, and comprehensive backup system",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "cross-env DEVTOOLS=true electron .",
+    "build": "electron-builder --win",
+    "build:msi": "electron-builder --win --config.win.target=msi && powershell -ExecutionPolicy Bypass -File sign-msi.ps1",
+    "build:mac": "electron-builder --mac",
+    "build:mac:dmg": "electron-builder --mac --config.mac.target=dmg",
+    "build:all": "electron-builder --win --mac && powershell -ExecutionPolicy Bypass -File sign-msi.ps1",
+    "build:dir": "electron-builder --dir",
+    "sign": "powershell -ExecutionPolicy Bypass -File sign-msi.ps1"
+  },
+  "keywords": [
+    "markdown",
+    "notes",
+    "electron",
+    "desktop",
+    "note-taking",
+    "backup",
+    "dark-theme"
+  ],
+  "author": "Peyton Winn",
+  "license": "MIT",
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "electron": "^39.1.2",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "dompurify": "^3.3.0",
+    "jsdom": "^27.2.0",
+    "marked": "^17.0.0"
+  },
+  "build": {
+    "appId": "com.emeraldnotes.app",
+    "productName": "EmeraldNotes",
+    "win": {
+      "target": [
+        {
+          "target": "msi",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png"
+    },
+    "msi": {
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "perMachine": false,
+      "runAfterFinish": true
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "title": "EmeraldNotes ${version}",
+      "backgroundColor": "#1a1a1a",
+      "window": {
+        "width": 540,
+        "height": 380
+      }
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "index.html",
+      "styles.css",
+      "assets/**/*",
+      "node_modules/**/*"
+    ]
+  }
+}
