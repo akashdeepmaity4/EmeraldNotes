@@ -1,15 +1,14 @@
-# MSI Code Signing Script for EmeraldNotes
-# This script automatically signs the MSI installer after building
-
 param(
     [string]$MsiPath = "dist\EmeraldNotes*.msi",
-    [string]$TimestampServer = "http://timestamp.digicert.com"
+    [string]$TimestampServer = "http://digicert.com",
+    [string]$Base64Certificate = "",
+    [string]$CertificatePassword = ""
 )
 
-Write-Host "=== EmeraldNotes MSI Signing Script ===" -ForegroundColor Cyan
+Write-Host "=== Veritas Notes MSI Signing Script ===" -ForegroundColor Cyan
 Write-Host ""
 
-# Find the MSI file
+# 1. Find the MSI file
 $msiFiles = Get-ChildItem -Path $MsiPath -ErrorAction SilentlyContinue
 if (-not $msiFiles) {
     Write-Host "ERROR: No MSI file found matching pattern: $MsiPath" -ForegroundColor Red
@@ -19,15 +18,37 @@ if (-not $msiFiles) {
 $msiFile = $msiFiles[0].FullName
 Write-Host "Found MSI file: $msiFile" -ForegroundColor Green
 
-# Find the code signing certificate
-$cert = Get-ChildItem -Path Cert:\CurrentUser\My | 
-    Where-Object { $_.Subject -like "*EmeraldNotes*" -and $_.EnhancedKeyUsageList.FriendlyName -contains "Code Signing" } |
-    Select-Object -First 1
+# 2. Acquire the Code Signing Certificate
+$cert = $null
+$tempCertPath = $null
+
+if (-not [string]::IsNullOrWhiteSpace($Base64Certificate)) {
+    # CI/CD Mode: Loading certificate from GitHub Secrets text
+    Write-Host "CI/CD Context Detected: Loading certificate from base64 environment variable..." -ForegroundColor Cyan
+    try {
+        $certBytes = [System.Convert]::FromBase64String($Base64Certificate)
+        $tempCertPath = Join-Path $env:TEMP "temp_signing_cert.pfx"
+        [System.IO.File]::WriteAllBytes($tempCertPath, $certBytes)
+        
+        $secPassword = ConvertTo-SecureString $CertificatePassword -AsPlainText -Force
+        $cert = Get-PfxCertificate -FilePath $tempCertPath -Password $secPassword
+    } catch {
+        Write-Host "ERROR: Failed to decode or parse the provided base64 certificate!" -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Red
+        exit 1
+    }
+} else {
+    # Local Mode: Loading certificate from your Windows User Certificate Store
+    Write-Host "Local Context Detected: Searching local Windows User Certificate Store..." -ForegroundColor Cyan
+    $cert = Get-ChildItem -Path Cert:\CurrentUser\My | 
+        Where-Object { $_.Subject -like "*Veritas Notes*" -and $_.EnhancedKeyUsageList.FriendlyName -contains "Code Signing" } |
+        Select-Object -First 1
+}
 
 if (-not $cert) {
-    Write-Host "ERROR: No EmeraldNotes code signing certificate found!" -ForegroundColor Red
-    Write-Host "Run the following to create one:" -ForegroundColor Yellow
-    Write-Host '  New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=EmeraldNotes, O=Peyton Winn, C=US" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(2)' -ForegroundColor Yellow
+    Write-Host "ERROR: No Veritas Notes code signing certificate could be loaded!" -ForegroundColor Red
+    Write-Host "Locally, run the following to recreate one if needed:" -ForegroundColor Yellow
+    Write-Host '  New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=Veritas Notes, O=Akash Deep Maity, C=IN" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(2)' -ForegroundColor Yellow
     exit 1
 }
 
@@ -37,7 +58,7 @@ Write-Host "  Thumbprint: $($cert.Thumbprint)"
 Write-Host "  Expires: $($cert.NotAfter)"
 Write-Host ""
 
-# Sign the MSI file
+# 3. Sign the MSI file
 Write-Host "Signing MSI file..." -ForegroundColor Cyan
 try {
     $result = Set-AuthenticodeSignature -FilePath $msiFile -Certificate $cert -TimestampServer $TimestampServer
@@ -49,8 +70,7 @@ try {
         Write-Host ""
         
         if ($result.Status -eq "UnknownError") {
-            Write-Host "Note: Status shows 'UnknownError' because this is a self-signed certificate." -ForegroundColor Yellow
-            Write-Host "The file IS signed, but Windows will show a warning unless the certificate is trusted." -ForegroundColor Yellow
+            Write-Host "Note: Status shows 'UnknownError'. This is normal for self-signed certificates or environments missing root trust chains." -ForegroundColor Yellow
         }
     } else {
         Write-Host "WARNING: Signing completed with status: $($result.Status)" -ForegroundColor Yellow
@@ -60,6 +80,10 @@ try {
     Write-Host "ERROR: Failed to sign MSI file!" -ForegroundColor Red
     Write-Host $_.Exception.Message -ForegroundColor Red
     exit 1
+} finally {
+    if ($tempCertPath -and (Test-Path $tempCertPath)) {
+        Remove-Item $tempCertPath -Force -ErrorAction SilentlyContinue
+    }
 }
 
 Write-Host ""
