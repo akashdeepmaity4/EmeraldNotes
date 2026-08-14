@@ -6,6 +6,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dist": "electron-builder",
     "dev": "cross-env DEVTOOLS=true electron .",
     "build": "electron-builder --win",
     "build:msi": "electron-builder --win --config.win.target=msi && powershell -ExecutionPolicy Bypass -File sign-msi.ps1",
