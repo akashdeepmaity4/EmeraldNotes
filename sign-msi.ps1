@@ -1,5 +1,5 @@
 param(
-    [string]$MsiPath = "dist\EmeraldNotes*.msi",
+    [string]$MsiPath = "dist\VeritasNotes*.msi",
     [string]$TimestampServer = "http://digicert.com",
     [string]$Base64Certificate = "",
     [string]$CertificatePassword = ""
