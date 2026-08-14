@@ -1,8 +1,8 @@
 {
-  "name": "emeraldnotes",
-  "productName": "EmeraldNotes",
-  "version": "1.0.6",
-  "description": "A beautiful markdown notes application with dark theme, real-time preview, and comprehensive backup system",
+  "name": "veritasnotes",
+  "productName": "VeritasNotes",
+  "version": "2.0.0",
+  "description": "notes app",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -37,8 +37,8 @@
     "marked": "^17.0.0"
   },
   "build": {
-    "appId": "com.emeraldnotes.app",
-    "productName": "EmeraldNotes",
+    "appId": "com.veritasnotes.akash",
+    "productName": "VeritasNotes",
     "win": {
       "target": [
         {
@@ -86,7 +86,7 @@
           "path": "/Applications"
         }
       ],
-      "title": "EmeraldNotes ${version}",
+      "title": "VeritasNotes ${version}",
       "backgroundColor": "#1a1a1a",
       "window": {
         "width": 540,
