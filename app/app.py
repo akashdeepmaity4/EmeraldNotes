@@ -85,7 +85,7 @@ def get_preview(content, max_chars=140):
 def home():
     filenames = [f for f in os.listdir(STORAGE_PATH) if f.endswith(('.md', '.txt'))]
     if not filenames:
-        return r('empty.html')
+        return r('index.html')
 
     projects = []
     for fname in filenames:
@@ -98,11 +98,11 @@ def home():
             preview = "(unable to read file)"
         projects.append({'filename': fname, 'preview': preview})
 
-    return r('dashboard.html', projects=projects)
+    return r('index.html', projects=projects)
 
 @app.route('/new')
 def new_project():
-    return r('editor.html', filename='', content='')
+    return r('index.html', filename='', content='')
 
 @app.route('/edit/<filename>')
 def edit_project(filename):
@@ -113,7 +113,7 @@ def edit_project(filename):
     if os.path.exists(filepath):
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
-        return r('editor.html', filename=filename, content=content)
+        return r('index.html', filename=filename, content=content)
     return redirect(url_for('home'))
 
 @app.route('/api/parse', methods=['POST'])
