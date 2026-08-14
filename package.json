@@ -1,12 +1,11 @@
 {
-  "name": "emeraldnotes",
-  "productName": "EmeraldNotes",
+  "name": "Veritasnotes",
+  "productName": "VeritasNotes",
   "version": "1.0.6",
-  "description": "A beautiful markdown notes application with dark theme, real-time preview, and comprehensive backup system",
+  "description": "Notes app",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder",
     "dev": "cross-env DEVTOOLS=true electron .",
     "build": "electron-builder --win",
     "build:msi": "electron-builder --win --config.win.target=msi && powershell -ExecutionPolicy Bypass -File sign-msi.ps1",
@@ -25,7 +24,7 @@
     "backup",
     "dark-theme"
   ],
-  "author": "Peyton Winn",
+  "author": "Akash Deep Maity",
   "license": "MIT",
   "devDependencies": {
     "cross-env": "^10.1.0",

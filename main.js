@@ -37,6 +37,8 @@ function loadSettings() {
     console.error('Error loading settings:', err);
   }
 }
+
+// Save settings to file
 function saveSettings() {
   try {
     const settingsPath = path.join(app.getPath('userData'), 'settings.json');
@@ -53,7 +55,7 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     backgroundColor: '#1a1a1a',
-    title: 'EmeraldNotes',
+    title: 'VeritasNotes',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -61,9 +63,10 @@ function createWindow() {
     },
     frame: true,
     titleBarStyle: 'default',
-    icon: path.join(__dirname, 'assets', 'emeraldnoteslogo.png')
+    icon: path.join(__dirname, 'assets', 'icon.png')
   });
 
+  // Create custom menu without Window option
   const template = [
     {
       label: 'File',

@@ -1,18 +1,13 @@
-// marked and DOMPurify are loaded via CDN in index.html
-// They are available as global variables
-
-// App State
 let state = {
   basePath: localStorage.getItem('notesBasePath') || null,
   currentFile: localStorage.getItem('lastOpenedFile') || null,
   directoryStructure: null,
   saveTimeout: null,
   renderTimeout: null,
-  ignoreInputCount: 0,  // Counter to skip handlePreviewInput during programmatic changes
-  skipNextInputEvent: false  // Flag to skip input event after special paste operations
+  ignoreInputCount: 0,
+  skipNextInputEvent: false
 };
 
-// Initialize the app
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('DOM Content Loaded - Initializing app...');
   console.log('marked available:', typeof marked !== 'undefined');
@@ -27,14 +22,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (state.basePath) {
     await loadDirectory(state.basePath);
     
-    // Restore the last opened file if it exists
     if (state.currentFile) {
-      // Verify the file still exists before opening it
       const result = await window.electronAPI.readFile(state.basePath, state.currentFile);
       if (result.success) {
         await openFile(state.currentFile);
       } else {
-        // File no longer exists, clear it
         state.currentFile = null;
         localStorage.removeItem('lastOpenedFile');
       }
@@ -45,11 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('App initialized successfully');
 });
 
-// Event Listeners
 function setupEventListeners() {
   console.log('Setting up event listeners...');
-  
-  // Home logo - navigate back to home screen
+
   const homeLogo = document.getElementById('home-logo');
   if (homeLogo) {
     homeLogo.addEventListener('click', () => {
@@ -57,8 +47,7 @@ function setupEventListeners() {
       navigateToHome();
     });
   }
-  
-  // Directory selection
+
   const selectDirBtn = document.getElementById('select-dir-btn');
   const selectDirEmpty = document.getElementById('select-dir-empty');
   const welcomeSelectDir = document.getElementById('welcome-select-dir');
@@ -769,7 +758,7 @@ async function showHelpMenu() {
   title.style.cssText = 'margin: 0 0 16px 0; color: #4ade80; font-size: 20px;';
   
   const description = document.createElement('p');
-  description.textContent = 'EmeraldNotes - Markdown Notes App';
+  description.textContent = 'VeritasNotes - Markdown Notes App';
   description.style.cssText = 'margin: 0 0 20px 0; color: #a0a0a0;';
   
   // Restore to previous session button
@@ -1040,7 +1029,7 @@ function showAboutModal() {
   
   // App Name
   const title = document.createElement('h1');
-  title.textContent = 'EmeraldNotes';
+  title.textContent = 'VeritasNotes';
   title.style.cssText = `
     margin: 0 0 8px 0;
     color: #4ade80;
@@ -1165,7 +1154,7 @@ function showAboutModal() {
     'Two-Tier Backup System',
     'Subfolder Image Support',
     'Interactive Checkboxes',
-    'Dark Theme with Emerald Accents'
+    'Dark Theme with Veritas Accents'
   ];
   
   const featuresList = document.createElement('ul');
@@ -1936,7 +1925,7 @@ function setupAIListeners() {
   if (githubTokenLink) {
     githubTokenLink.addEventListener('click', async (e) => {
       e.preventDefault();
-      await window.electronAPI.openExternal('https://github.com/settings/tokens/new?description=EmeraldNotes%20AI%20Assistant&scopes=');
+      await window.electronAPI.openExternal('https://github.com/settings/tokens/new?description=VeritasNotes%20AI%20Assistant&scopes=');
     });
   }
 }
@@ -5471,3 +5460,7 @@ function setupTableEditorListeners() {
     }
   });
 }
+
+// ============================================
+// END TABLE EDITOR FUNCTIONALITY
+// ============================================
