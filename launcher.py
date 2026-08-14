@@ -17,5 +17,5 @@ else:
     print("ERROR: check launcher.py")
 
 if __name__ == '__main__':
-    webview.create_window('Emerald Notes', app)
+    webview.create_window('Veritas Notes', app)
     webview.start()
