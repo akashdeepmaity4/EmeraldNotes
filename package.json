@@ -1,11 +1,12 @@
 {
-  "name": "veritasnotes",
-  "productName": "VeritasNotes",
-  "version": "2.0.0",
-  "description": "notes app",
+  "name": "emeraldnotes",
+  "productName": "EmeraldNotes",
+  "version": "1.0.6",
+  "description": "A beautiful markdown notes application with dark theme, real-time preview, and comprehensive backup system",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dist": "electron-builder",
     "dev": "cross-env DEVTOOLS=true electron .",
     "build": "electron-builder --win",
     "build:msi": "electron-builder --win --config.win.target=msi && powershell -ExecutionPolicy Bypass -File sign-msi.ps1",
