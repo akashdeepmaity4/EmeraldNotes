@@ -30,15 +30,15 @@ if (-not [string]::IsNullOrWhiteSpace($Base64Certificate)) {
         $tempCertPath = Join-Path $env:TEMP "temp_signing_cert.pfx"
         [System.IO.File]::WriteAllBytes($tempCertPath, $certBytes)
         
-        $secPassword = ConvertTo-SecureString $CertificatePassword -AsPlainText -Force
-        # Changed -Password to -SecurePassword for PowerShell 7+ compatibility
-        $cert = Get-PfxCertificate -FilePath $tempCertPath -SecurePassword $secPassword
+        # This native .NET method bypasses all version compatibility issues completely!
+        $cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($tempCertPath, $CertificatePassword, [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
 
     } catch {
         Write-Host "ERROR: Failed to decode or parse the provided base64 certificate!" -ForegroundColor Red
         Write-Host $_.Exception.Message -ForegroundColor Red
         exit 1
     }
+
 } else {
     # Local Mode: Loading certificate from your Windows User Certificate Store
     Write-Host "Local Context Detected: Searching local Windows User Certificate Store..." -ForegroundColor Cyan
