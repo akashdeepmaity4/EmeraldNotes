@@ -1,4 +1,4 @@
-name: Build Electron Executables
+name: Build and Sign Electron App
 
 on:
   push:
@@ -6,12 +6,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+  build-and-sign:
+    name: Build & Sign on Windows
+    runs-on: windows-latest
 
     steps:
     - name: Checkout Code
@@ -28,12 +25,16 @@ jobs:
 
     - name: Package Application
       run: npm run dist
-      env:
-        # Prevents code-signing errors on Mac if you don't have a developer certificate yet
-        CSC_IDENTITY_AUTODISCOVER: false 
 
-    - name: Upload Desktop Artifacts
+    - name: Digitally Sign MSI Installer
+      run: |
+        powershell -File ./sign-msi.ps1 `
+          -Base64Certificate "${{ secrets.SIGNING_CERT_BASE64 }}" `
+          -CertificatePassword "${{ secrets.SIGNING_CERT_PASSWORD }}"
+      shell: powershell
+
+    - name: Upload Signed Installer Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Electron-Release-${{ matrix.os }}
-        path: dist/
+        name: VeritasNotes-Windows-Signed
+        path: dist/*.msi
