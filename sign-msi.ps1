@@ -31,7 +31,9 @@ if (-not [string]::IsNullOrWhiteSpace($Base64Certificate)) {
         [System.IO.File]::WriteAllBytes($tempCertPath, $certBytes)
         
         $secPassword = ConvertTo-SecureString $CertificatePassword -AsPlainText -Force
-        $cert = Get-PfxCertificate -FilePath $tempCertPath -Password $secPassword
+        # Changed -Password to -SecurePassword for PowerShell 7+ compatibility
+        $cert = Get-PfxCertificate -FilePath $tempCertPath -SecurePassword $secPassword
+
     } catch {
         Write-Host "ERROR: Failed to decode or parse the provided base64 certificate!" -ForegroundColor Red
         Write-Host $_.Exception.Message -ForegroundColor Red
