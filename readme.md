@@ -1,5 +1,6 @@
 # VERITAS NOTES
-Veritas Notes is an ultra-lightweight standard text editor which allows the user to create and edit any text-based file. It is fully local, keeping your files 100% safe inside your own local storage.
+
+Veritas Notes is an ultra-lightweight standard text editor which allows the user to create and edit any text-based file. It is fully local, keeping your files 100% safe inside your own local storage. Veritas Notes is also a Markdown note-taking application made to be a lite alternative to Obsidian.
 
 ![techstack](https://img.shields.io/badge/Python-blue)
 ![techstack](https://img.shields.io/badge/Bash-green)
